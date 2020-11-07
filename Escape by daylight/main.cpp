@@ -2,7 +2,6 @@
 #include<iostream>
 #include<Windows.h>
 
-
 int main()
 {
 	int i = 1;
@@ -38,6 +37,10 @@ int main()
 	{
 		std::cout << "Load failed" << std::endl;
 	}
+	if (!playerTexture2.loadFromFile("C:/Users/เคโรโระ/Downloads/assets/assets/player/man2.png"))
+	{
+		std::cout << "Load failed" << std::endl;
+	}
 	
 	if (!Enermy.loadFromFile("C:/Users/เคโรโระ/Downloads/DarkSaber/DarkSaber/walk/darksabers3.png"))
 	{
@@ -46,17 +49,18 @@ int main()
 
 
 	////// Sprite
-	sf::Sprite shapeSprite;
-	sf::Sprite shapeSprite2;
-	sf::Sprite shapeSprite1;
+	sf::Sprite shapeSprite; //ตัวเอก
+	sf::Sprite shapeSprite2; // ตัวเอกฟลิป
+	sf::Sprite shapeSprite1; //ศัตรู
 	sf::Sprite bg;
 	sf::Sprite bg1;
-	sf::Sprite bg0;
-	bg0.setTexture(Backgound0);
+	sf::Sprite bg2;
+	bg2.setTexture(Backgound0);
 	bg.setTexture(Backgound);
 	bg1.setTexture(Backgound1);
 	shapeSprite.setTexture(playerTexture);	
 	shapeSprite1.setTexture(Enermy);
+	shapeSprite2.setTexture(playerTexture2);
 	
 	
 	int spriteSizeX = playerTexture.getSize().x / 8;
@@ -69,11 +73,13 @@ int main()
 	//int sprite0SizeY = Backgound.getSize().y / 1;
 
 	
-	bg.setTextureRect(sf::IntRect(0, 0, 1080, 720));
+	
+	bg.setScale(1.0f,1.0f);
+	
 	bg1.setTextureRect(sf::IntRect(0, 0, 1080, 720));
-	bg0.setTextureRect(sf::IntRect(0, 0, 1080, 720));
+	bg2.setTextureRect(sf::IntRect(0, 0, 1080, 720));
 	shapeSprite.setTextureRect(sf::IntRect(0, 0, spriteSizeX, spriteSizeY));
-	//shapeSprite2.setTextureRect(sf::IntRect(0, 0, sprite2SizeX, sprite2SizeY));
+	shapeSprite2.setTextureRect(sf::IntRect(0, 0, spriteSizeX, spriteSizeY));
 	shapeSprite1.setTextureRect(sf::IntRect(0, 0, sprite1SizeX, sprite1SizeY));
 
 	
@@ -83,21 +89,47 @@ int main()
 	shapeSprite1.setPosition(spawnPoint);
 	shapeSprite.setPosition(spawn2Point);
 	bg1.setPosition(1080.f,0.f);
-	bg0.setPosition(-1080.f, 0.f);
-	//shapeSprite2.setPosition(spawn2Point);
+	bg2.setPosition(2160.f, 0.f);
+	shapeSprite2.setPosition(spawn2Point);
 
 	int animationFrame = 0;
 	int animationFrame1 = 0;
 	int animationFrame2 = 0;
 
+	bool canJump = true;
+	const float gravity = 1;
+	float movespeed = 1.0f ,jumpspeed = 15.1f,jumpheight = 50.0f;
+	int groundheight = 400 ,j=0;
+	//sf::Vector2f velocity(sf::Vector2f(0, 0));
+	sf::Vector2f s;
+	
+
+	sf::View view,view1;
+	view.reset(sf::FloatRect(0, 0, 1080, 720));
+	view.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
+	
+	
+
+	sf::Vector2f position(0, 0);
+	sf::Vector2f position2(0, 0);
+
+	
+	
+	sf::FloatRect       fBounds(1080.f, 0.f, 1000.f, 1000.f);
+	sf::IntRect         iBounds(fBounds);
+
 	while (window.isOpen())
 	{
+		
+		window.setView(view);
+		
 		window.draw(bg);
 		window.draw(bg1);
-		window.draw(bg0);
+		window.draw(bg2);
 		window.draw(shapeSprite);
 		window.draw(shapeSprite1);
-		
+		//window.draw(shapeSprite2);
+		//window.setView(window.getDefaultView());
 		window.display();
 		
 		
@@ -106,37 +138,28 @@ int main()
 		shapeSprite1.setTextureRect(sf::IntRect(sprite1SizeX * animationFrame1, sprite1SizeY * 0, sprite1SizeX, sprite1SizeY));
 		
 		
-
-
+		
+		shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * 0, spriteSizeY * 0, spriteSizeX, spriteSizeY));
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		{
+		{	
 			shapeSprite.move(15.1f, 0.f);
-			if (shapeSprite.getPosition().y) { printf("555"); }
 			shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * animationFrame, spriteSizeY * 3, spriteSizeX, spriteSizeY));
-			bg.move(-2.0f, 0.f);
-			bg.setTextureRect(sf::IntRect(1080 * animationFrame2, 720 *0 , 1080, 720));
-			bg1.move(-2.0f, 0.f);
-			bg1.setTextureRect(sf::IntRect(1080 * animationFrame2, 720 * 0, 1080, 720));
-			bg0.move(-2.0f, 0.f);
-			bg0.setTextureRect(sf::IntRect(1080 * animationFrame2, 720 * 0, 1080, 720));
+			//velocity.x = movespeed;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		{
-			
+		{	
 			shapeSprite.move(-15.1f, 0.f);			
 			shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * animationFrame, spriteSizeY * 3, spriteSizeX, spriteSizeY));
-			bg.move(2.0f, 0.f);
-			bg.setTextureRect(sf::IntRect(1080 * animationFrame2, 720 * 0, 1080, 720));
-			bg1.move(2.0f, 0.f);
-			bg1.setTextureRect(sf::IntRect(1080 * animationFrame2, 720 * 0, 1080, 720));
-			bg0.move(2.0f, 0.f);
-			bg0.setTextureRect(sf::IntRect(1080 * animationFrame2, 720 * 0, 1080, 720));
+			//velocity.x = -movespeed;
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && canJump == true)
+		{	
+			j = 8;
+			canJump = false;	
 			
-			shapeSprite.move(0.f, -15.1f);
-			shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * animationFrame, spriteSizeY * 3, spriteSizeX, spriteSizeY));
+			//shapeSprite.move(velocity.x, velocity.y);
+			//shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * 5, spriteSizeY * 1, spriteSizeX, spriteSizeY));
+					
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		{
@@ -149,6 +172,10 @@ int main()
 		{
 			window.close();
 		}
+
+		//velocity.x = 0;
+
+
 		animationFrame++;
 		animationFrame1++;
 		animationFrame2++;
@@ -166,9 +193,60 @@ int main()
 			
 		}
 		if (shapeSprite1.getGlobalBounds().intersects(shapeSprite.getGlobalBounds())) {
-			shapeSprite1.setPosition(spawnPoint);
-		//	Sleep(120);
+			
+			shapeSprite.move(15.0f, 0.f);		
 		}
+
+		position.x = shapeSprite.getPosition().x +250 - 1080 ;
+		position.y = shapeSprite.getPosition().y +10 - 720 ;
+
+		//bg1.setPosition(fBounds.left, fBounds.top /* - 1000.f + View.getSize().y */ - 0);
+
+		if (position.x < 0 )
+		{
+			position.x = 0;
+		
+		}
+		if (position.y < 0)
+		{
+			position.y = 0;
+		}
+		view.reset(sf::FloatRect(position.x, position.y, 1080, 720));
+		if (canJump == false)
+		{
+			if (j > 4)
+			{
+				j--;
+				s.y = -(jumpheight);
+				shapeSprite.move(s);
+				shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * 5, spriteSizeY * 1, spriteSizeX, spriteSizeY));
+				printf("%d", j);
+				printf(" ");
+			}
+			else if (j <= 4)
+			{
+				if (j == 0)
+				{
+					canJump == true;
+				}
+				else
+				{
+					j--;
+					s.y = jumpheight;
+					shapeSprite.move(s);
+					shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * 5, spriteSizeY * 1, spriteSizeX, spriteSizeY));
+					printf("%d", j);
+					printf(" ");
+
+					
+				}
+				
+			}
+			
+		}
+		
+	
+		
 		window.clear();
 	}
 	return 0;
