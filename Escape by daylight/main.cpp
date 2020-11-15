@@ -7,10 +7,7 @@ int main()
 	int i = 1;
 	sf::RenderWindow window(sf::VideoMode(1080, 720), "Escape by daylight");
 
-	////// Circle
-	//sf::CircleShape collision(100.f);
-	//collision.setPosition({ 200.f, 200.f });
-	//collision.setFillColor(sf::Color::Red);
+	
 
 	////// Texture
 	sf::Texture playerTexture;
@@ -19,6 +16,8 @@ int main()
 	sf::Texture Backgound;//แบกกลาวจอกลาง
 	sf::Texture Backgound1;//แบกกลาวหลุดจอขวา
 	sf::Texture Backgound0;//แบกกลาวหลุดจอซ้าย
+	sf::Texture HPbar;
+	
 	
 	if (!Backgound.loadFromFile("C:/Users/เคโรโระ/Downloads/jpg2png/backgound.jpg"))
 	{
@@ -46,6 +45,10 @@ int main()
 	{
 		std::cout << "Load failed" << std::endl;
 	}
+	if (!HPbar.loadFromFile("C:/Users/เคโรโระ/Downloads/assets/assets/player/HP.jpg"))
+	{
+		std::cout << "Load failed" << std::endl;
+	}
 
 
 	////// Sprite
@@ -55,12 +58,14 @@ int main()
 	sf::Sprite bg;
 	sf::Sprite bg1;
 	sf::Sprite bg2;
+	sf::Sprite hpbar;
 	bg2.setTexture(Backgound0);
 	bg.setTexture(Backgound);
 	bg1.setTexture(Backgound1);
 	shapeSprite.setTexture(playerTexture);	
 	shapeSprite1.setTexture(Enermy);
 	shapeSprite2.setTexture(playerTexture2);
+	hpbar.setTexture(HPbar);
 	
 	
 	int spriteSizeX = playerTexture.getSize().x / 8;
@@ -71,8 +76,6 @@ int main()
 
 	//int sprite0SizeX = Backgound.getSize().x / 1;
 	//int sprite0SizeY = Backgound.getSize().y / 1;
-
-	
 	
 	bg.setScale(1.0f,1.0f);
 	
@@ -91,6 +94,14 @@ int main()
 	bg1.setPosition(1080.f,0.f);
 	bg2.setPosition(2160.f, 0.f);
 	shapeSprite2.setPosition(spawn2Point);
+	hpbar.setPosition(0, 0);
+
+	int myhp = 91800;
+	sf::RectangleShape hp(sf::Vector2f(myhp / 250, 40));//เซตขนาดของหลอดเลือด
+	hp.setFillColor(sf::Color::Red);//เซตสี
+	hp.setPosition(sf::Vector2f(32, 0));//เซตตำแหน่งของหลอด
+	
+
 
 	int animationFrame = 0;
 	int animationFrame1 = 0;
@@ -100,7 +111,7 @@ int main()
 	const float gravity = 1;
 	float movespeed = 1.0f ,jumpspeed = 15.1f,jumpheight = 50.0f;
 	int groundheight = 400 ,j=0;
-	//sf::Vector2f velocity(sf::Vector2f(0, 0));
+	sf::Vector2f velocity(sf::Vector2f(0, 0));
 	sf::Vector2f s;
 	
 
@@ -108,15 +119,15 @@ int main()
 	view.reset(sf::FloatRect(0, 0, 1080, 720));
 	view.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 	
-	
-
 	sf::Vector2f position(0, 0);
 	sf::Vector2f position2(0, 0);
-
-	
 	
 	sf::FloatRect       fBounds(1080.f, 0.f, 1000.f, 1000.f);
 	sf::IntRect         iBounds(fBounds);
+
+
+	
+
 
 	while (window.isOpen())
 	{
@@ -125,7 +136,9 @@ int main()
 		
 		window.draw(bg);
 		window.draw(bg1);
-		window.draw(bg2);
+		window.draw(hpbar);
+		window.draw(hp);
+		//window.draw(bg2);
 		window.draw(shapeSprite);
 		window.draw(shapeSprite1);
 		//window.draw(shapeSprite2);
@@ -134,39 +147,40 @@ int main()
 		
 		
 		Sleep(60);
-		shapeSprite1.move(1.0f, 0.f);
+		//shapeSprite1.move(1.0f, 0.f);
 		shapeSprite1.setTextureRect(sf::IntRect(sprite1SizeX * animationFrame1, sprite1SizeY * 0, sprite1SizeX, sprite1SizeY));
 		
 		
 		
 		shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * 0, spriteSizeY * 0, spriteSizeX, spriteSizeY));
+		shapeSprite.setTextureRect(sf::IntRect(spriteSizeX* animationFrame, spriteSizeY * 3, spriteSizeX, spriteSizeY));
+
+
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 		{	
-			shapeSprite.move(15.1f, 0.f);
+			//shapeSprite.move(15.1f, 0.f);
 			shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * animationFrame, spriteSizeY * 3, spriteSizeX, spriteSizeY));
-			//velocity.x = movespeed;
+			if (shapeSprite.getPosition().x < 960)
+			{
+				shapeSprite.move(15.1f, 0.f);
+			}
+			
+
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 		{	
 			shapeSprite.move(-15.1f, 0.f);			
 			shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * animationFrame, spriteSizeY * 3, spriteSizeX, spriteSizeY));
-			//velocity.x = -movespeed;
+			
+			
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && canJump == true)
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && canJump == true|| sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && canJump == true)
 		{	
 			j = 8;
-			canJump = false;	
-			
-			//shapeSprite.move(velocity.x, velocity.y);
-			//shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * 5, spriteSizeY * 1, spriteSizeX, spriteSizeY));
-					
+			canJump = false;
+							
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		{
-			
-			shapeSprite.move(0.f, 15.1f);
-			shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * animationFrame, spriteSizeY * 3, spriteSizeX, spriteSizeY));
-		}
+		
 	
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 		{
@@ -194,24 +208,50 @@ int main()
 		}
 		if (shapeSprite1.getGlobalBounds().intersects(shapeSprite.getGlobalBounds())) {
 			
-			shapeSprite.move(15.0f, 0.f);		
+			shapeSprite.move(15.0f, 0.f);
+			myhp -= 1000;
+			hp.setSize(sf::Vector2f(myhp / 250, 40));
+			
+
 		}
 
-		position.x = shapeSprite.getPosition().x +250 - 1080 ;
-		position.y = shapeSprite.getPosition().y +10 - 720 ;
+		//position.x = shapeSprite.getPosition().x +250 - 1080 ;
+		//position.y = shapeSprite.getPosition().y +10 - 720 ;
 
 		//bg1.setPosition(fBounds.left, fBounds.top /* - 1000.f + View.getSize().y */ - 0);
 
-		if (position.x < 0 )
-		{
-			position.x = 0;
-		
-		}
-		if (position.y < 0)
+		//if (position.x < 0 )
+		//{
+		//	position.x = 0;	
+		//}
+		/*if (position.y < 0)
 		{
 			position.y = 0;
-		}
-		view.reset(sf::FloatRect(position.x, position.y, 1080, 720));
+		}*/
+		//view.reset(sf::FloatRect(position.x, position.y, 1080, 720));
+	
+
+
+
+
+		//เมื่อภาพไม่อยู่ในขนาดกว้าง 1024 ของหน้าจอทางซ้าย ให้ย้ายตำแหน่งไปทางขวา
+			if (bg.getPosition().x < -1080)
+				bg.setPosition(bg1.getPosition().x + 1080, 0);
+			if (bg1.getPosition().x < -1080)
+				bg1.setPosition(bg.getPosition().x + 1080, 0);
+			//เมื่อภาพไม่อยู่ในขนาดกว้าง 1024 ของหน้าจอทางซ้าย ให้ย้ายตำแหน่งไปทางขวา
+			/*if (bg.getPosition().x > 1080) bg.setPosition(-
+				bg1.getPosition().x + 1080, 0);
+			if (bg1.getPosition().x > 1080) bg1.setPosition(-
+				bg.getPosition().x + 1080, 0);*/
+
+			if (bg.getPosition().x > 1080) bg.setPosition(-1080, 0);
+			if (bg1.getPosition().x > 1080) bg1.setPosition(-1080, 0);
+			//ขยับไปโดย ระยะทาง = ความเร็ว * เวลาที่เปลี่ยนไป
+			bg.move(-10.0f, 0.f);
+			bg1.move(-10.0f, 0.f);
+		
+			
 		if (canJump == false)
 		{
 			if (j > 4)
@@ -220,14 +260,14 @@ int main()
 				s.y = -(jumpheight);
 				shapeSprite.move(s);
 				shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * 5, spriteSizeY * 1, spriteSizeX, spriteSizeY));
-				printf("%d", j);
-				printf(" ");
+				
 			}
 			else if (j <= 4)
 			{
 				if (j == 0)
 				{
-					canJump == true;
+					canJump = true;
+					
 				}
 				else
 				{
@@ -235,15 +275,15 @@ int main()
 					s.y = jumpheight;
 					shapeSprite.move(s);
 					shapeSprite.setTextureRect(sf::IntRect(spriteSizeX * 5, spriteSizeY * 1, spriteSizeX, spriteSizeY));
-					printf("%d", j);
-					printf(" ");
-
+					
+					
 					
 				}
 				
 			}
-			
+		
 		}
+		
 		
 	
 		
