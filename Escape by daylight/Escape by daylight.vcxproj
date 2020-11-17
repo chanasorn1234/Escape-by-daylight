@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Downloads\assets\assets\player\man.png" />
@@ -155,6 +156,9 @@
     <Image Include="..\..\..\..\Downloads\DarkSaber\DarkSaber\walk\en4.png" />
     <Image Include="..\..\..\..\Downloads\DarkSaber\DarkSaber\walk\en5.png" />
     <Image Include="..\..\..\..\Downloads\jpg2png\backgound.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Menu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
